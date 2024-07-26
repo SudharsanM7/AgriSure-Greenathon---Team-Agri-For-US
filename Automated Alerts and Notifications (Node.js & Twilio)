@@ -1,0 +1,21 @@
+To send notifications or alerts, you can integrate with Twilio for SMS messaging.
+
+Server Code (Node.js):
+
+const twilio = require('twilio');
+const accountSid = 'your_account_sid';
+const authToken = 'your_auth_token';
+const client = new twilio(accountSid, authToken);
+
+const sendAlert = (message) => {
+  client.messages.create({
+    body: message,
+    to: '+1234567890', // Your phone number
+    from: '+0987654321' // Twilio phone number
+  })
+  .then(message => console.log(`Alert sent: ${message.sid}`))
+  .catch(error => console.error('Error sending alert:', error));
+};
+
+// Example usage
+sendAlert('Soil moisture is below threshold! Consider watering the plants.');
