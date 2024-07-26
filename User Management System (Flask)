@@ -1,0 +1,29 @@
+For managing users (e.g., adding or removing users), you can extend the Flask server.
+
+Server Code (Flask):
+
+from flask import Flask, request, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
+from pymongo import MongoClient
+
+app = Flask(__name__)
+client = MongoClient("mongodb://localhost:27017/")
+db = client.smart_agriculture
+
+@app.route('/add_user', methods=['POST'])
+def add_user():
+    content = request.json
+    username = content['username']
+    password = generate_password_hash(content['password'])
+    db.users.insert_one({"username": username, "password": password})
+    return jsonify({"status": "User added successfully"}), 201
+
+@app.route('/delete_user', methods=['DELETE'])
+def delete_user():
+    content = request.json
+    username = content['username']
+    db.users.delete_one({"username": username})
+    return jsonify({"status": "User deleted successfully"}), 200
+
+if __name__ == '__main__':
+    app.run(debug=True)
