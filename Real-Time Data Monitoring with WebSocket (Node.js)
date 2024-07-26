@@ -1,0 +1,62 @@
+For real-time data updates, you can use WebSockets. Here's a basic example using Node.js and the ws library to handle WebSocket communication.
+
+const WebSocket = require('ws');
+const express = require('express');
+const app = express();
+const port = 3000;
+
+const wss = new WebSocket.Server({ port: 8080 });
+
+wss.on('connection', ws => {
+  console.log('Client connected');
+  
+  // Send data to the client every 5 seconds
+  setInterval(() => {
+    const data = {
+      temperature: Math.random() * 30, // Random temperature
+      humidity: Math.random() * 100 // Random humidity
+    };
+    ws.send(JSON.stringify(data));
+  }, 5000);
+
+  ws.on('message', message => {
+    console.log(`Received message => ${message}`);
+  });
+
+  ws.on('close', () => {
+    console.log('Client disconnected');
+  });
+});
+
+app.listen(port, () => {
+  console.log(`Server listening at http://localhost:${port}`);
+});
+
+Client Code (HTML/JavaScript) :
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-Time Data Monitoring</title>
+</head>
+<body>
+  <h1>Real-Time Data</h1>
+  <div id="data-container"></div>
+
+  <script>
+    const ws = new WebSocket('ws://localhost:8080');
+
+    ws.onmessage = function(event) {
+      const data = JSON.parse(event.data);
+      document.getElementById('data-container').innerHTML = `
+        <p>Temperature: ${data.temperature.toFixed(2)} °C</p>
+        <p>Humidity: ${data.humidity.toFixed(2)} %</p>
+      `;
+    };
+  </script>
+</body>
+</html>
+
+
