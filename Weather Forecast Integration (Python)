@@ -1,0 +1,26 @@
+To include weather forecasts in the data, you can use a weather API like OpenWeatherMap.
+
+Python Code:
+
+import requests
+
+API_KEY = 'your_openweathermap_api_key'
+CITY = 'your_city'
+
+def get_weather_forecast():
+    url = f'http://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={API_KEY}&units=metric'
+    response = requests.get(url)
+    data = response.json()
+    return {
+        'temperature': data['main']['temp'],
+        'humidity': data['main']['humidity'],
+        'weather': data['weather'][0]['description']
+    }
+
+# Example usage
+forecast = get_weather_forecast()
+print(f"Temperature: {forecast['temperature']} °C")
+print(f"Humidity: {forecast['humidity']} %")
+print(f"Weather: {forecast['weather']}")
+
+
