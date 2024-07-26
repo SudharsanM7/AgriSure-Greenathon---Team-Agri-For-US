@@ -1,0 +1,29 @@
+Generate automated reports with data analysis using Pandas.
+
+Python Code:
+
+import pandas as pd
+
+# Load dataset
+data = pd.read_csv('crop_data.csv')
+
+# Generate summary statistics
+summary = data.describe()
+
+# Generate a report
+report = f"""
+Crop Data Report
+----------------
+Summary Statistics:
+{summary}
+
+Total Crop Yield: {data['crop_yield'].sum()}
+Average Temperature: {data['temperature'].mean()}
+Average Humidity: {data['humidity'].mean()}
+"""
+
+# Save report to a file
+with open('crop_data_report.txt', 'w') as f:
+    f.write(report)
+
+print('Report generated successfully.')
