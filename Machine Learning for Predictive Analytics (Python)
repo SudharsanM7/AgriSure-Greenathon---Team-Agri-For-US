@@ -1,0 +1,48 @@
+Use machine learning to predict future weather conditions or crop yields based on historical data. Here’s an example using the scikit-learn library for a basic prediction model.
+
+Setup:
+
+Install necessary packages:
+
+pip install scikit-learn pandas numpy
+
+Python Code:
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+import pickle
+
+# Load dataset
+data = pd.read_csv('historical_crop_yield.csv')
+
+# Preprocessing
+X = data[['temperature', 'humidity', 'rainfall']]
+y = data['crop_yield']
+
+# Split data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Predictions
+predictions = model.predict(X_test)
+mse = mean_squared_error(y_test, predictions)
+print(f'Mean Squared Error: {mse}')
+
+# Save model
+with open('crop_yield_model.pkl', 'wb') as f:
+    pickle.dump(model, f)
+
+# Load model and make prediction
+def predict_yield(temperature, humidity, rainfall):
+    with open('crop_yield_model.pkl', 'rb') as f:
+        model = pickle.load(f)
+    return model.predict([[temperature, humidity, rainfall]])[0]
+
+# Example usage
+predicted_yield = predict_yield(30, 70, 150)
+print(f'Predicted Crop Yield: {predicted_yield}')
