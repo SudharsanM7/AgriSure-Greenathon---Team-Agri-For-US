@@ -1,0 +1,87 @@
+Using fl_chart package for data visualization in Flutter.
+
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:fl_chart/fl_chart.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Smart Agriculture',
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+      ),
+      home: MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  List<FlSpot> data = [];
+
+  Future<void> fetchData() async {
+    final response = await http.get(Uri.parse('http://localhost:5000/data'));
+    if (response.statusCode == 200) {
+      List<dynamic> rawData = json.decode(response.body);
+      List<FlSpot> spots = rawData.map((item) {
+        return FlSpot(
+          DateTime.parse(item['timestamp']).millisecondsSinceEpoch.toDouble(),
+          item['temperature'],
+        );
+      }).toList();
+      setState(() {
+        data = spots;
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Smart Agriculture - Data Visualization'),
+      ),
+      body: Center(
+        child: data.isEmpty
+            ? CircularProgressIndicator()
+            : LineChart(
+                LineChartData(
+                  gridData: FlGridData(show: false),
+                  titlesData: FlTitlesData(show: false),
+                  borderData: FlBorderData(show: true),
+                  minX: data.first.x,
+                  maxX: data.last.x,
+                  minY: data.map((e) => e.y).reduce((a, b) => a < b ? a : b),
+                  maxY: data.map((e) => e.y).reduce((a, b) => a > b ? a : b),
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: data,
+                      isCurved: true,
+                      colors: [Colors.blue],
+                      dotData: FlDotData(show: false),
+                      belowBarData: BarAreaData(show: false),
+                    ),
+                  ],
+                ),
+              ),
+      ),
+    );
+  }
+}
