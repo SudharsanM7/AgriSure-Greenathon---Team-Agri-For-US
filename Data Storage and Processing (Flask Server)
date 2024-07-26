@@ -1,0 +1,23 @@
+from flask import Flask, request, jsonify
+from pymongo import MongoClient
+
+app = Flask(__name__)
+
+# MongoDB setup
+client = MongoClient("mongodb://localhost:27017/")
+db = client.smart_agriculture
+collection = db.sensor_data
+
+@app.route('/data', methods=['POST'])
+def data():
+    content = request.json
+    collection.insert_one(content)
+    return jsonify({"status": "success"}), 201
+
+@app.route('/data', methods=['GET'])
+def get_data():
+    data = list(collection.find({}, {'_id': 0}))
+    return jsonify(data), 200
+
+if __name__ == '__main__':
+    app.run(debug=True)
